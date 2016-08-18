@@ -1,0 +1,4 @@
+suites:
+    jws-ecdsa:
+        namespace: JDR\JWS\ECDSA
+        psr4_prefix: JDR\JWS\ECDSA
