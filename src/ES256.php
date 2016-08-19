@@ -67,10 +67,9 @@ final class ES256 implements LcobucciJWTSigner
         $randomK = $random->generate($generator->getOrder());
         $signature = $signer->sign($privateKey, $hash, $randomK);
 
-        $r = str_pad($adapter->decHex((string) $signature->getR()), 64, '0', STR_PAD_LEFT);
-        $s = str_pad($adapter->decHex((string) $signature->getS()), 64, '0', STR_PAD_LEFT);
+        $serializer = new SignatureSerializer($adapter);
 
-        return new LcobucciJWTSignature(pack('H*', $r.$s));
+        return new LcobucciJWTSignature($serializer->serialize($signature, $this->getAlgorithmId()));
     }
 
     /**
@@ -96,8 +95,8 @@ final class ES256 implements LcobucciJWTSigner
         $pemSerializer = new PemPublicKeySerializer(new DerPublicKeySerializer($adapter));
         $publicKey = $pemSerializer->parse($key->getContent());
 
-        list($r, $s) = str_split(unpack('H*', $expected)[1], 64);
-        $signature = new EccSignature(gmp_init($adapter->hexDec($r), 10), gmp_init($adapter->hexDec($s), 10));
+        $serializer = new SignatureSerializer($adapter);
+        $signature = $serializer->unserialize($expected, $this->getAlgorithmId());
 
         $signer = new EccSigner($adapter);
         $hash = $signer->hashData($generator, 'sha256', $payload);
