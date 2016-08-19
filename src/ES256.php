@@ -9,10 +9,6 @@ use Mdanter\Ecc\Crypto\Signature\Signature as EccSignature;
 use Mdanter\Ecc\Crypto\Signature\Signer as EccSigner;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Random\RandomGeneratorFactory;
-use Mdanter\Ecc\Serializer\PrivateKey\DerPrivateKeySerializer;
-use Mdanter\Ecc\Serializer\PrivateKey\PemPrivateKeySerializer;
-use Mdanter\Ecc\Serializer\PublicKey\DerPublicKeySerializer;
-use Mdanter\Ecc\Serializer\PublicKey\PemPublicKeySerializer;
 use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
 
 final class ES256 implements LcobucciJWTSigner
@@ -56,8 +52,8 @@ final class ES256 implements LcobucciJWTSigner
         $adapter = EccFactory::getAdapter();
         $generator = EccFactory::getNistCurves()->generator256();
 
-        $pemSerializer = new PemPrivateKeySerializer(new DerPrivateKeySerializer($adapter));
-        $privateKey = $pemSerializer->parse($key->getContent());
+        $keyParser = new KeyParser($adapter);
+        $privateKey = $keyParser->parsePrivateKey($key->getContent());
 
         $signer = new EccSigner($adapter);
         $hash = $signer->hashData($generator, 'sha256', $payload);
@@ -92,8 +88,8 @@ final class ES256 implements LcobucciJWTSigner
         $adapter = EccFactory::getAdapter();
         $generator = EccFactory::getNistCurves()->generator256();
 
-        $pemSerializer = new PemPublicKeySerializer(new DerPublicKeySerializer($adapter));
-        $publicKey = $pemSerializer->parse($key->getContent());
+        $keyParser = new KeyParser($adapter);
+        $publicKey = $keyParser->parsePublicKey($key->getContent());
 
         $serializer = new SignatureSerializer($adapter);
         $signature = $serializer->unserialize($expected, $this->getAlgorithmId());
