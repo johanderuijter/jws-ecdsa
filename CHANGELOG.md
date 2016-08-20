@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - ES384 JWS Signer.
 - ES512 JWS Signer.
 
-## Changed
+### Changed
 - Introduced a signature serializer to format the signatures.
 - Introduced a key parser to convert the keys into the right format.
 
