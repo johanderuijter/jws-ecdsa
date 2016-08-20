@@ -16,6 +16,8 @@ abstract class AbstractSigner implements LcobucciJWTSigner
 {
     const HASH_ALGORITHM = [
         'ES256' => 'sha256',
+        'ES384' => 'sha384',
+        'ES512' => 'sha512',
     ];
 
     /**

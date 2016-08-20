@@ -9,6 +9,8 @@ class SignatureSerializer
 {
     const LENGTH = [
         'ES256' => 64,
+        'ES384' => 96,
+        'ES512' => 132,
     ];
 
     /**
