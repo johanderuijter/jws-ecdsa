@@ -27,13 +27,6 @@ class ES256Spec extends ObjectBehavior
         $this->getAlgorithmId()->shouldReturn('ES256');
     }
 
-    function it_should_modify_the_header_to_include_the_algorithm()
-    {
-        // warning: Parameter 1 to JDR\JWS\ECDSA\Signer::modifyHeader() expected to be a reference, value given
-        // $headers = [];
-        // $this->modifyHeader($headers)->shouldHaveKeyWithValue('alg', 'ES256');
-    }
-
     function it_should_sign_the_payload()
     {
         $payload = $this->getPayload();
