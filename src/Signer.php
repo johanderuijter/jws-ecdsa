@@ -4,11 +4,9 @@ namespace JDR\JWS\ECDSA;
 
 use Lcobucci\JWT\Signature as LcobucciJWTSignature;
 use Lcobucci\JWT\Signer\Key;
-use Mdanter\Ecc\Crypto\Signature\Signature as EccSignature;
 use Mdanter\Ecc\Crypto\Signature\Signer as EccSigner;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Math\GmpMathInterface;
-use Mdanter\Ecc\Primitives\GeneratorPoint;
 use Mdanter\Ecc\Random\RandomGeneratorFactory;
 
 class Signer
