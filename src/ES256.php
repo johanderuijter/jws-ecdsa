@@ -17,7 +17,12 @@ final class ES256 implements LcobucciJWTSigner
      */
     public function __construct()
     {
-        $this->signer = new Signer($this->getAlgorithmId());
+        $config = new SignerConfig(
+            EccFactory::getNistCurves()->generator256(),
+            'sha256',
+            64
+        );
+        $this->signer = new Signer($config);
     }
 
     /**

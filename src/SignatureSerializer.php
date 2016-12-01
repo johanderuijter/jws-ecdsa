@@ -7,12 +7,6 @@ use Mdanter\Ecc\Math\GmpMathInterface;
 
 class SignatureSerializer
 {
-    const LENGTH = [
-        'ES256' => 64,
-        'ES384' => 96,
-        'ES512' => 132,
-    ];
-
     /**
      * @var GmpMathInterface
      */
@@ -35,10 +29,10 @@ class SignatureSerializer
      *
      * @return string
      */
-    public function serialize(Signature $signature, $algorithm)
+    public function serialize(Signature $signature, $length)
     {
-        $r = str_pad($this->adapter->decHex((string) $signature->getR()), $this->getLength($algorithm), '0', STR_PAD_LEFT);
-        $s = str_pad($this->adapter->decHex((string) $signature->getS()), $this->getLength($algorithm), '0', STR_PAD_LEFT);
+        $r = str_pad($this->adapter->decHex((string) $signature->getR()), $length, '0', STR_PAD_LEFT);
+        $s = str_pad($this->adapter->decHex((string) $signature->getS()), $length, '0', STR_PAD_LEFT);
 
         return pack('H*', $r.$s);
     }
@@ -50,22 +44,10 @@ class SignatureSerializer
      *
      * @return Signature
      */
-    public function unserialize($binary, $algorithm)
+    public function unserialize($binary, $length)
     {
-        list($r, $s) = str_split(unpack('H*', $binary)[1], $this->getLength($algorithm));
+        list($r, $s) = str_split(unpack('H*', $binary)[1], $length);
 
         return new Signature(gmp_init($this->adapter->hexDec($r), 10), gmp_init($this->adapter->hexDec($s), 10));
-    }
-
-    /**
-     * Get the length of the binary string
-     *
-     * @param string $algorithm
-     *
-     * @return int
-     */
-    private function getLength($algorithm)
-    {
-        return self::LENGTH[$algorithm];
     }
 }

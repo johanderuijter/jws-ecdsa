@@ -17,7 +17,12 @@ final class ES384 implements LcobucciJWTSigner
      */
     public function __construct()
     {
-        $this->signer = new Signer($this->getAlgorithmId());
+        $config = new SignerConfig(
+            EccFactory::getNistCurves()->generator384(),
+            'sha384',
+            96
+        );
+        $this->signer = new Signer($config);
     }
 
     /**

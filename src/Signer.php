@@ -13,32 +13,15 @@ use Mdanter\Ecc\Random\RandomGeneratorFactory;
 
 class Signer
 {
-    const GENERATOR = [
-        'ES256' => 'generator256',
-        'ES384' => 'generator384',
-        'ES512' => 'generator521',
-    ];
-
-    const HASH_ALGORITHM = [
-        'ES256' => 'sha256',
-        'ES384' => 'sha384',
-        'ES512' => 'sha512',
-    ];
+    /**
+     * @var SignerConfig
+     */
+    private $config;
 
     /**
      * @var GmpMathInterface
      */
     private $adapter;
-
-    /**
-     * @var GeneratorPoint
-     */
-    private $generator;
-
-    /**
-     * @var string
-     */
-    private $algorithm;
 
     /**
      * @var KeyParser
@@ -53,13 +36,12 @@ class Signer
     /**
      * Constructor
      *
-     * @param string $algorithm
+     * @param SignerConfig $config
      */
-    public function __construct($algorithm)
+    public function __construct($config)
     {
-        $this->algorithm = $algorithm;
+        $this->config = $config;
         $this->adapter = EccFactory::getAdapter();
-        $this->generator = $this->getGenerator($algorithm);
         $this->keyParser = new KeyParser($this->adapter);
         $this->serializer = new SignatureSerializer($this->adapter);
     }
@@ -82,14 +64,14 @@ class Signer
         $privateKey = $this->keyParser->parsePrivateKey($key->getContent());
 
         $signer = new EccSigner($this->adapter);
-        $hash = $signer->hashData($this->generator, $this->getHashAlgorithm($this->algorithm), $payload);
+        $hash = $signer->hashData($this->config->getGenerator(), $this->config->getHashingAlgorithm(), $payload);
 
         $random = RandomGeneratorFactory::getRandomGenerator();
 
-        $randomK = $random->generate($this->generator->getOrder());
+        $randomK = $random->generate($this->config->getGenerator()->getOrder());
         $signature = $signer->sign($privateKey, $hash, $randomK);
 
-        return new LcobucciJWTSignature($this->serializer->serialize($signature, $this->algorithm));
+        return new LcobucciJWTSignature($this->serializer->serialize($signature, $this->config->getSignatureLength()));
     }
 
     /**
@@ -110,37 +92,11 @@ class Signer
         }
         $publicKey = $this->keyParser->parsePublicKey($key->getContent());
 
-        $signature = $this->serializer->unserialize($expected, $this->algorithm);
+        $signature = $this->serializer->unserialize($expected, $this->config->getSignatureLength());
 
         $signer = new EccSigner($this->adapter);
-        $hash = $signer->hashData($this->generator, $this->getHashAlgorithm($this->algorithm), $payload);
+        $hash = $signer->hashData($this->config->getGenerator(), $this->config->getHashingAlgorithm(), $payload);
 
         return $signer->verify($publicKey, $signature, $hash);
-    }
-
-    /**
-     * Get ecc generator
-     *
-     * @param string $algorithm
-     *
-     * @return string
-     */
-    private function getGenerator($algorithm)
-    {
-        $generator = self::GENERATOR[$algorithm];
-
-        return EccFactory::getNistCurves()->$generator();
-    }
-
-    /**
-     * Get hash algorithm
-     *
-     * @param string $algorithm
-     *
-     * @return string
-     */
-    private function getHashAlgorithm($algorithm)
-    {
-        return self::HASH_ALGORITHM[$algorithm];
     }
 }

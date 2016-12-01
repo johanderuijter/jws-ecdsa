@@ -25,21 +25,21 @@ class SignatureSerializerSpec extends ObjectBehavior
     {
         $r = 1;
         $s = 2;
-        $this->serialize($this->getSignature($r, $s), 'ES256')->shouldReturn($this->getBinaryString($r, $s, 64));
+        $this->serialize($this->getSignature($r, $s), 64)->shouldReturn($this->getBinaryString($r, $s, 64));
     }
 
     function it_should_unserialize_a_binary_string_to_a_signature_interface()
     {
         $r = 1;
         $s = 2;
-        $this->unserialize($this->getBinaryString($r, $s, 64), 'ES256')->shouldReturnAnInstanceOf(SignatureInterface::class);
+        $this->unserialize($this->getBinaryString($r, $s, 64), 64)->shouldReturnAnInstanceOf(SignatureInterface::class);
     }
 
     function it_should_unserialize_a_binary_string_to_an_EC256_signature()
     {
         $r = 1;
         $s = 2;
-        $this->unserialize($this->getBinaryString($r, $s, 64), 'ES256')->shouldBeLike($this->getSignature($r, $s));
+        $this->unserialize($this->getBinaryString($r, $s, 64), 64)->shouldBeLike($this->getSignature($r, $s));
     }
 
     private function getSignature($r, $s)

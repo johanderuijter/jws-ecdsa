@@ -17,7 +17,12 @@ final class ES512 implements LcobucciJWTSigner
      */
     public function __construct()
     {
-        $this->signer = new Signer($this->getAlgorithmId());
+        $config = new SignerConfig(
+            EccFactory::getNistCurves()->generator521(),
+            'sha512',
+            132
+        );
+        $this->signer = new Signer($config);
     }
 
     /**
