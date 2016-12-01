@@ -55,7 +55,7 @@ class Signer
      *
      * @param string $algorithm
      */
-    public function __construct(string $algorithm)
+    public function __construct($algorithm)
     {
         $this->algorithm = $algorithm;
         $this->adapter = EccFactory::getAdapter();
