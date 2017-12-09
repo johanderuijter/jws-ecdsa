@@ -2,9 +2,12 @@
 
 namespace JDR\JWS\ECDSA;
 
+use function class_exists;
+use GMP;
 use Lcobucci\JWT\Signature as LcobucciJWTSignature;
 use Lcobucci\JWT\Signer\Key;
 use Mdanter\Ecc\Crypto\Signature\Signer as EccSigner;
+use Mdanter\Ecc\Crypto\Signature\SignHasher;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Math\GmpMathInterface;
 use Mdanter\Ecc\Random\RandomGeneratorFactory;
@@ -61,12 +64,12 @@ class Signer
         }
         $privateKey = $this->keyParser->parsePrivateKey($key->getContent());
 
-        $signer = new EccSigner($this->adapter);
-        $hash = $signer->hashData($this->config->getGenerator(), $this->config->getHashingAlgorithm(), $payload);
+        $hash = $this->hash($payload);
 
         $random = RandomGeneratorFactory::getRandomGenerator();
-
         $randomK = $random->generate($this->config->getGenerator()->getOrder());
+
+        $signer = new EccSigner($this->adapter);
         $signature = $signer->sign($privateKey, $hash, $randomK);
 
         return new LcobucciJWTSignature($this->serializer->serialize($signature, $this->config->getSignatureLength()));
@@ -92,9 +95,30 @@ class Signer
 
         $signature = $this->serializer->unserialize($expected, $this->config->getSignatureLength());
 
+        $hash = $this->hash($payload);
+
         $signer = new EccSigner($this->adapter);
-        $hash = $signer->hashData($this->config->getGenerator(), $this->config->getHashingAlgorithm(), $payload);
 
         return $signer->verify($publicKey, $signature, $hash);
+    }
+
+    /**
+     * Hash the payload
+     *
+     * @param string $payload
+     *
+     * @return GMP
+     */
+    private function hash($payload)
+    {
+        if (class_exists(SignHasher::class)) {
+            $hasher = new SignHasher($this->config->getHashingAlgorithm());
+
+            return $hasher->makeHash($payload, $this->config->getGenerator());
+        }
+
+        $signer = new EccSigner($this->adapter);
+
+        return $signer->hashData($this->config->getGenerator(), $this->config->getHashingAlgorithm(), $payload);
     }
 }

@@ -10,8 +10,8 @@
         }
     ],
     "require": {
-        "lcobucci/jwt": "~3.0, >=3.0.4",
-        "mdanter/ecc": "~0.4.0"
+        "lcobucci/jwt": "^3.0.4",
+        "mdanter/ecc": "^0.4|^0.5"
     },
     "require-dev": {
         "phpspec/phpspec": "~3.2"
